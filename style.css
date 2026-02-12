@@ -979,6 +979,8 @@ footer p {
 .dresscode-image-container {
     margin-top: 40px;
     text-align: center !important;
+    display:flex !important;
+    justify-content: center !important;
 }
 
 .dresscode-image {
@@ -994,6 +996,9 @@ footer p {
     border-style: none !important;
     border-width: 0 !important;
     border-color: transparent !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .dresscode-image:hover {
@@ -1062,4 +1067,5 @@ footer p {
     background: linear-gradient(90deg, #b7a18b, #6b4f3a);
     height: 3px;
 }
+
 
