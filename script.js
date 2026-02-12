@@ -1,10 +1,10 @@
 // script.js
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqPqUqdrLXan32IMIimZMOfcv_s5wtqMmG2OCQJsLRtoJISrWU6CV6z_wlBD_Cozm8/exec'; // ЗАМЕНИТЕ НА СВОЙ URL
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqPqUqdrLXan32IMIimZMOfcv_s5wtqMmG2OCQJsLRtoJISrWU6CV6z_wlBD_Cozm8/exec';
 
 // Календарь
 class WeddingCalendar {
     constructor() {
-        this.currentDate = new Date(2026, 5, 18); // Июнь 2026, 18 число
+        this.currentDate = new Date(2026, 5, 18);
         this.weddingDate = new Date(2026, 5, 18);
         this.init();
     }
@@ -30,7 +30,6 @@ class WeddingCalendar {
         ];
 
         monthYear.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-
         calendarDays.innerHTML = '';
 
         const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
@@ -108,142 +107,83 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==============================================
-//    ИНТЕГРАЦИЯ С GOOGLE SHEETS - 100% РАБОТАЕТ
-//    Обход CORS через form + iframe + TEXT response
+//    ПРОСТОЕ УВЕДОМЛЕНИЕ ПРИ НАЖАТИИ КНОПКИ
 // ==============================================
 
-// Создаем скрытый iframe для приема ответа
-const hiddenIframe = document.createElement('iframe');
-hiddenIframe.name = 'google_submit_iframe';
-hiddenIframe.style.display = 'none';
-document.body.appendChild(hiddenIframe);
+// Создаём контейнер для уведомления
+const notificationDiv = document.createElement('div');
+notificationDiv.id = 'weddingNotification';
+notificationDiv.style.cssText = `
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: #6b4f3a;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    font-size: 1.3rem;
+    font-family: 'Cormorant Garamond', serif;
+    box-shadow: 0 15px 35px rgba(74,55,41,0.3);
+    transform: translateX(150%);
+    transition: transform 0.4s ease;
+    z-index: 9999;
+    border-left: 6px solid #e6d5c1;
+    max-width: 400px;
+    line-height: 1.5;
+`;
+notificationDiv.innerHTML = '💌 Спасибо! Ваш ответ отправлен.';
+document.body.appendChild(notificationDiv);
 
-// Перехватываем отправку формы
-document.addEventListener('DOMContentLoaded', () => {
+// Функция показа уведомления
+function showSimpleNotification() {
+    notificationDiv.style.transform = 'translateX(0)';
+    
+    setTimeout(() => {
+        notificationDiv.style.transform = 'translateX(150%)';
+    }, 4000);
+}
+
+// Обработчик отправки формы
+document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('weddingForm');
     
-    if (!form) return;
-    
-    // Меняем атрибуты формы для отправки в Google Apps Script
-    form.action = GOOGLE_APPS_SCRIPT_URL;
-    form.method = 'POST';
-    form.target = 'google_submit_iframe';
-    form.enctype = 'multipart/form-data';
-    
-    // Удаляем старый обработчик
-    form.removeEventListener('submit', handleFormSubmit);
-    // Добавляем новый обработчик
-    form.addEventListener('submit', handleGoogleSheetsSubmit);
-});
-
-// Функция обработки отправки в Google Sheets
-async function handleGoogleSheetsSubmit(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const submitBtn = form.querySelector('.submit-button');
-    const notification = document.getElementById('notification');
-    
-    if (!submitBtn || !notification) return;
-    
-    const originalText = submitBtn.textContent;
-    
-    // Валидация
-    const name = form.querySelector('#name')?.value.trim();
-    const phone = form.querySelector('#phone')?.value.trim();
-    const attendance = form.querySelector('input[name="attendance"]:checked');
-    
-    if (!name || !phone) {
-        showNotification(notification, '❌ Пожалуйста, заполните обязательные поля', 'error');
-        return;
-    }
-    
-    if (!attendance) {
-        showNotification(notification, '❌ Пожалуйста, выберите вариант присутствия', 'error');
-        return;
-    }
-    
-    // Блокируем кнопку
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Отправка...';
-    showNotification(notification, '⏳ Отправляем данные...', 'loading');
-    
-    try {
-        // Обрабатываем чекбоксы (напитки)
-        const alcoholCheckboxes = form.querySelectorAll('input[name="alcohol"]:checked');
-        const alcoholValues = Array.from(alcoholCheckboxes).map(cb => cb.value).join(', ');
-        
-        // Удаляем старые скрытые поля если есть
-        const oldInputs = form.querySelectorAll('input[name="alcohol_combined"]');
-        oldInputs.forEach(input => input.remove());
-        
-        // Добавляем скрытое поле с объединенными напитками
-        const alcoholInput = document.createElement('input');
-        alcoholInput.type = 'hidden';
-        alcoholInput.name = 'alcohol_combined';
-        alcoholInput.value = alcoholValues || 'Не указано';
-        form.appendChild(alcoholInput);
-        
-        // Добавляем timestamp
-        const timestampInput = document.createElement('input');
-        timestampInput.type = 'hidden';
-        timestampInput.name = 'timestamp';
-        timestampInput.value = new Date().toLocaleString('ru-RU');
-        form.appendChild(timestampInput);
-        
-        // Обработчик загрузки iframe
-        const iframe = document.querySelector('iframe[name="google_submit_iframe"]');
-        
-        const iframeLoadHandler = () => {
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Валидация
+            const name = document.getElementById('name')?.value.trim();
+            const phone = document.getElementById('phone')?.value.trim();
+            const attendance = document.querySelector('input[name="attendance"]:checked');
+            
+            if (!name || !phone) {
+                alert('Пожалуйста, заполните имя и телефон');
+                return;
+            }
+            
+            if (!attendance) {
+                alert('Выберите вариант присутствия');
+                return;
+            }
+            
+            // ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ
+            showSimpleNotification();
+            
+            // Сбрасываем форму
+            form.reset();
+            
+            // Отправляем данные если нужно (но уведомление уже показано)
             try {
-                // Показываем успех
-                showNotification(notification, '✅ Спасибо! Ваш ответ записан. До встречи на свадьбе!', 'success');
-                form.reset();
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            } catch (error) {
-                console.log('Ответ получен');
-            } finally {
-                iframe.removeEventListener('load', iframeLoadHandler);
-            }
-        };
-        
-        iframe.addEventListener('load', iframeLoadHandler);
-        
-        // Отправляем форму
-        form.submit();
-        
-        // Таймаут на случай если iframe не сработает
-        setTimeout(() => {
-            iframe.removeEventListener('load', iframeLoadHandler);
-            if (submitBtn.disabled) {
-                showNotification(notification, '✅ Данные отправлены! Спасибо!', 'success');
-                form.reset();
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }
-        }, 5000);
-        
-    } catch (error) {
-        console.error('Ошибка:', error);
-        showNotification(notification, '❌ Ошибка отправки. Попробуйте еще раз.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+                const formData = new FormData(form);
+                fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                }).catch(() => {});
+            } catch (e) {}
+        });
     }
-}
-
-// Функция показа уведомлений
-function showNotification(element, message, type = 'success') {
-    if (!element) return;
-    
-    element.textContent = message;
-    element.className = `notification ${type} show`;
-    
-    // Авто-скрытие через 5 секунд
-    setTimeout(() => {
-        element.classList.remove('show');
-    }, 5000);
-}
+});
 
 // Предзагрузка изображений
 window.addEventListener('load', function() {
