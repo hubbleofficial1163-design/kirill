@@ -1041,3 +1041,24 @@ footer p {
     line-height: 1.2 !important;
 }
 
+/* Улучшение для уведомлений */
+.wedding-notification {
+    z-index: 10000;
+    border: 1px solid rgba(107, 79, 58, 0.15);
+}
+
+.wedding-notification.success .notification-icon {
+    background: #6b4f3a;
+    animation: gentlePulse 2s infinite;
+}
+
+@keyframes gentlePulse {
+    0% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(107, 79, 58, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0); }
+}
+
+.wedding-notification .notification-progress {
+    background: linear-gradient(90deg, #b7a18b, #6b4f3a);
+    height: 3px;
+}
