@@ -829,20 +829,6 @@ footer p {
         height: 50px;
     }
 
-    .dresscode-image-container {
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-        padding: 0 !important;
-    }
-    
-    .dresscode-image {
-        margin: 0 auto !important;
-        display: block !important;
-        max-width: 90%;
-        width: auto;
-    }
-
     .radio-group {
         flex-direction: column;
         gap: 15px;
@@ -952,16 +938,6 @@ footer p {
         padding-top: 40px;
         font-size: 1.1rem;
     }
-
-    .dresscode-image-container {
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-    }
-    
-    .dresscode-image {
-        margin: 0 auto !important;
-    }
 }
 
 @media (max-width: 360px) {
@@ -1003,8 +979,9 @@ footer p {
 .dresscode-image-container {
     margin-top: 40px;
     text-align: center !important;
-    display:flex !important;
+    display: flex !important;
     justify-content: center !important;
+    width: 100% !important;
 }
 
 .dresscode-image {
@@ -1053,7 +1030,6 @@ footer p {
     margin-top: 0;        /* без отступа сверху */
 }
 
-
 /* Дополнительно — обнуляем отступы у всего блока */
 .dresscode-image-container {
     margin-bottom: 0 !important;
@@ -1092,5 +1068,36 @@ footer p {
     height: 3px;
 }
 
+/* Центрирование фото дресс-кода на мобильных устройствах */
+@media (max-width: 768px) {
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .dresscode-image {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: block !important;
+        max-width: 90%;
+    }
+}
 
-
+@media (max-width: 480px) {
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+    
+    .dresscode-image {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: block !important;
+    }
+}
