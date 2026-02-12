@@ -829,6 +829,20 @@ footer p {
         height: 50px;
     }
 
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    .dresscode-image {
+        margin: 0 auto !important;
+        display: block !important;
+        max-width: 90%;
+        width: auto;
+    }
+
     .radio-group {
         flex-direction: column;
         gap: 15px;
@@ -937,6 +951,16 @@ footer p {
         margin-top: 40px;
         padding-top: 40px;
         font-size: 1.1rem;
+    }
+
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+    
+    .dresscode-image {
+        margin: 0 auto !important;
     }
 }
 
@@ -1067,5 +1091,6 @@ footer p {
     background: linear-gradient(90deg, #b7a18b, #6b4f3a);
     height: 3px;
 }
+
 
 
