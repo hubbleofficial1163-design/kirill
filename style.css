@@ -454,38 +454,58 @@ section {
 
 .dresscode-text {
     font-size: 1.4rem;
-    margin-bottom: 50px;
+    margin-bottom: -50px;
     color: var(--dark-brown);
 }
 
 .color-palette {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 40px;
-    flex-wrap: wrap;
+    display: none;
 }
 
-.color-item {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 3px solid var(--white);
-    box-shadow: 0 5px 15px rgba(74, 55, 41, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
+/* Дресс-код — фото вместо кружков */
+.dresscode-image-container {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
-.color-item:hover {
-    transform: scale(1.1) rotate(10deg);
+.dresscode-image {
+    max-width: 90%;
+    width: 400px;
+    border-radius: 20px;
+    transition: transform 0.4s ease;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-style: none !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
-.color-beige { background: #f5efe9; }
-.color-taupe { background: #b7a18b; }
-.color-light-brown { background: #8b6b4f; }
-.color-warm-brown { background: #6b4f3a; }
-.color-deep-brown { background: #4a3729; }
-.color-cream { background: #fffaf4; }
+.dresscode-image:hover {
+    transform: scale(1.01);
+}
+
+.dresscode-caption {
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
+    font-size: 1.2rem;
+    color: var(--dark-brown);
+    line-height: 1.2 !important;
+}
+
+.dresscode-caption i {
+    margin-right: 4px;
+    color: var(--warm-brown);
+}
 
 /* Details - Детали */
 .details-section {
@@ -722,6 +742,28 @@ footer p {
     opacity: 0.1;
 }
 
+/* Улучшение для уведомлений */
+.wedding-notification {
+    z-index: 10000;
+    border: 1px solid rgba(107, 79, 58, 0.15);
+}
+
+.wedding-notification.success .notification-icon {
+    background: #6b4f3a;
+    animation: gentlePulse 2s infinite;
+}
+
+@keyframes gentlePulse {
+    0% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(107, 79, 58, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0); }
+}
+
+.wedding-notification .notification-progress {
+    background: linear-gradient(90deg, #b7a18b, #6b4f3a);
+    height: 3px;
+}
+
 /* Оптимизация для смартфонов */
 @media (max-width: 1024px) {
     .container {
@@ -824,11 +866,6 @@ footer p {
         font-size: 1.1rem;
     }
 
-    .color-item {
-        width: 50px;
-        height: 50px;
-    }
-
     .radio-group {
         flex-direction: column;
         gap: 15px;
@@ -849,6 +886,19 @@ footer p {
     .map-button {
         padding: 12px 30px;
         font-size: 1rem;
+    }
+    
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+    
+    .dresscode-image {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: 90%;
     }
 }
 
@@ -920,11 +970,6 @@ footer p {
         font-size: 1rem;
     }
 
-    .color-item {
-        width: 40px;
-        height: 40px;
-    }
-
     footer {
         padding: 50px 0;
     }
@@ -937,6 +982,18 @@ footer p {
         margin-top: 40px;
         padding-top: 40px;
         font-size: 1.1rem;
+    }
+    
+    .dresscode-image-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+    
+    .dresscode-image {
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 }
 
@@ -960,10 +1017,6 @@ footer p {
         background: transparent;
     }
     
-    .color-item:hover {
-        transform: none;
-    }
-    
     .submit-button:hover {
         transform: none;
         box-shadow: none;
@@ -973,131 +1026,8 @@ footer p {
         transform: none;
         box-shadow: none;
     }
-}
-
-/* Дресс-код — фото вместо кружков */
-.dresscode-image-container {
-    margin-top: 40px;
-    text-align: center !important;
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-}
-
-.dresscode-image {
-    max-width: 90%;
-    width: 400px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(74, 55, 41, 0.15);
-    border: 3px solid var(--white);
-    transition: transform 0.4s ease;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    border-style: none !important;
-    border-width: 0 !important;
-    border-color: transparent !important;
-    display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
-
-.dresscode-image:hover {
-    transform: scale(1.01);
-}
-
-.dresscode-caption {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    color: var(--dark-brown);
-}
-
-.dresscode-caption i {
-    margin-right: 4px;
-    color: var(--warm-brown);
-}
-
-/* Убираем старую палитру цветов */
-.color-palette {
-    display: none;
-}
-
-.dresscode-text {
-    margin-bottom: -50px;  /* почти вплотную */
-}
-
-.dresscode-image-container {
-    margin-top: 0;        /* без отступа сверху */
-}
-
-/* Дополнительно — обнуляем отступы у всего блока */
-.dresscode-image-container {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-.dresscode-image {
-    margin-bottom: 0 !important;
-    display: block !important;
-}
-
-.dresscode-caption {
-    margin-top: 2px !important;    /* минимальный отступ */
-    line-height: 1.2 !important;
-}
-
-/* Улучшение для уведомлений */
-.wedding-notification {
-    z-index: 10000;
-    border: 1px solid rgba(107, 79, 58, 0.15);
-}
-
-.wedding-notification.success .notification-icon {
-    background: #6b4f3a;
-    animation: gentlePulse 2s infinite;
-}
-
-@keyframes gentlePulse {
-    0% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(107, 79, 58, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(107, 79, 58, 0); }
-}
-
-.wedding-notification .notification-progress {
-    background: linear-gradient(90deg, #b7a18b, #6b4f3a);
-    height: 3px;
-}
-
-/* Центрирование фото дресс-кода на мобильных устройствах */
-@media (max-width: 768px) {
-    .dresscode-image-container {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
     
-    .dresscode-image {
-        margin-left: auto !important;
-        margin-right: auto !important;
-        display: block !important;
-        max-width: 90%;
-    }
-}
-
-@media (max-width: 480px) {
-    .dresscode-image-container {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-    }
-    
-    .dresscode-image {
-        margin-left: auto !important;
-        margin-right: auto !important;
-        display: block !important;
+    .dresscode-image:hover {
+        transform: none;
     }
 }
