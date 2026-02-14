@@ -31,7 +31,9 @@
     <!-- Сохраните дату / календарь -->
     <section class="calendar-section">
         <div class="container">
-            <h2 class="section-title">Сохраните дату</h2>
+            <p style="text-align: center; color: var(--dark-brown); font-size: 1.5rem; margin-bottom: 40px;">
+                В этот день мы скажем друг другу «ДА»
+            </p>            
             <div class="calendar-container">
                 <div class="calendar-header">
                     <button class="calendar-nav" id="prevMonth">‹</button>
@@ -55,7 +57,7 @@
     <!-- Расписание дня -->
     <section class="timing-section">
         <div class="container">
-            <h2 class="section-title">Расписание дня</h2>
+            <h2 class="section-title">Тайминг</h2>
             <div class="timing-container">
                 <div class="timeline">
                     <div class="timeline-item">
@@ -63,8 +65,9 @@
                             <i class="fas fa-coffee"></i>
                         </div>
                         <div class="timeline-content">
-                            <div class="timeline-time">16:00 – 16:30</div>
+                            <div class="timeline-time">15:30</div>
                             <div class="timeline-text">Сбор гостей · фуршет</div>
+                            <div class="timeline-text">Собираясь на мероприятие, просим взять с собой ваши прекрасные улыбки и хорошее настроение</div>
                         </div>
                     </div>
                     <div class="timeline-item">
@@ -72,8 +75,9 @@
                             <i class="fas fa-camera"></i>
                         </div>
                         <div class="timeline-content">
-                            <div class="timeline-time">16:30 – 17:00</div>
-                            <div class="timeline-text">Фотосессия</div>
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-text">Начало банкета</div>
+                            <div class="timeline-text">Время вкусной еды, танцев и развлечений</div>
                         </div>
                     </div>
                     <div class="timeline-item">
@@ -81,8 +85,9 @@
                             <i class="fas fa-glass-cheers"></i>
                         </div>
                         <div class="timeline-content">
-                            <div class="timeline-time">17:00</div>
-                            <div class="timeline-text">Начало банкета · торжество</div>
+                            <div class="timeline-time">22:00 - 23:00</div>
+                            <div class="timeline-text">Завершение вечера</div>
+                            <div class="timeline-text">К сожалению, даже такой прекрасный вечер может закончиться</div>
                         </div>
                     </div>
                 </div>
@@ -95,9 +100,7 @@
         <div class="container">
             <h2 class="section-title">Локация</h2>
             <div class="location-block">
-                <div class="location-header">
-                    <h3 class="location-title">Место встречи</h3>
-                </div>
+
                 <div class="location-content">
                     <div>
                         <p class="location-text">
@@ -106,7 +109,7 @@
                         <div class="location-address">
                             г. Новосибирск,<br>Красный проспект, 22
                         </div>
-                        <a href="https://yandex.ru/maps/org/bely_zal/172033760143?si=j8wq3e1e513z40np9wcvpqkhdw" 
+                        <a href="https://yandex.ru/maps/65/novosibirsk/house/krasny_prospekt_220/bEsYfwZhQUIPQFtvfXx3eX1nYA==/?ll=82.911836%2C55.067840&z=18.2" 
                            target="_blank" class="map-button">
                            <i class="fas fa-map-marker-alt"></i> Открыть карту
                         </a>
@@ -125,7 +128,7 @@
             <h2 class="section-title">Дресс-код</h2>
             <div class="dresscode-content">
                 <p class="dresscode-text">
-                    Мы будем очень рады, если вы поддержите цветовую гамму торжества: бежевый, коричневый, черный.
+                    Мы будем рады если своими нарядами вы поддержите цветовую гамму нашей свадьбы представленную ниже: 
                 </p>
                 
                 <!-- Вместо цветных кружков — фото с примерами образов -->
@@ -142,7 +145,7 @@
     <!-- Важные детали (без смайликов) -->
     <section class="details-section">
         <div class="container">
-            <h2 class="section-title">Важные детали</h2>
+            <h2 class="section-title">Несколько просьб</h2>
             <div class="details-block">
                 <div class="details-content">
                     <div class="details-item">
@@ -155,7 +158,8 @@
                     </div>
                     <div class="details-item">
                         <div class="details-item-title">Подарки</div>
-                        <p>Ваше присутствие — главный подарок. Если хотите порадовать нас — предпочтительны подарки в конверте.</p>
+                        <p>Если хотите преподнести ценный и нужный подарок, мы будем очень благодарны за вклад в бюджет нашей молодой семьи.</p>
+                        <p>И совсем не важно, в какой концерт вы его упакуете!</p>
                     </div>
                 </div>
             </div>
@@ -165,9 +169,8 @@
     <!-- Анкета -->
     <section class="form-section">
         <div class="container">
-            <h2 class="section-title">Подтвердите участие</h2>
             <p style="text-align: center; color: var(--dark-brown); font-size: 1.3rem; margin-bottom: 40px;">
-                Пожалуйста, ответьте до 15 мая 2026
+                Пожалуйста, заполните анкету и подтвердите свое присутствие до 15.05.2026
             </p>
             
             <div id="notification" class="notification"></div>
@@ -270,5 +273,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
