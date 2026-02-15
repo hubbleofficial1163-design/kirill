@@ -74,21 +74,25 @@ class WeddingCalendar {
 }
 
 // Инициализация календаря
-const weddingCalendar = new WeddingCalendar();
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализируем календарь только если есть элементы на странице
+    if (document.getElementById('calendarDays')) {
+        const weddingCalendar = new WeddingCalendar();
+    }
 
-// Анимации при скролле
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.1 });
+    // Анимации при скролле
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
 
-document.addEventListener('DOMContentLoaded', () => {
     const formGroups = document.querySelectorAll('.form-group');
     formGroups.forEach(group => observer.observe(group));
     
+    // Плавный скролл для якорей
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -104,10 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Инициализация формы
+    initForm();
 });
 
 // ==============================================
-//    ПРОСТОЕ УВЕДОМЛЕНИЕ ПРИ НАЖАТИИ КНОПКИ
+//    УЛУЧШЕННОЕ УВЕДОМЛЕНИЕ И ОТПРАВКА ФОРМЫ
 // ==============================================
 
 // Создаём контейнер для уведомления
@@ -135,55 +142,219 @@ notificationDiv.innerHTML = '💌 Спасибо! Ваш ответ отправ
 document.body.appendChild(notificationDiv);
 
 // Функция показа уведомления
-function showSimpleNotification() {
+function showSimpleNotification(message = '💌 Спасибо! Ваш ответ отправлен.') {
+    notificationDiv.innerHTML = message;
     notificationDiv.style.transform = 'translateX(0)';
     
+    // Скрываем через 4 секунды
     setTimeout(() => {
         notificationDiv.style.transform = 'translateX(150%)';
     }, 4000);
 }
 
-// Обработчик отправки формы
-document.addEventListener('DOMContentLoaded', function() {
+// Функция для сбора данных формы в URL-encoded формат
+function serializeForm(form) {
+    const formData = new FormData(form);
+    const params = new URLSearchParams();
+    
+    // Сначала добавляем все обычные поля
+    for (let [key, value] of formData.entries()) {
+        // Пропускаем чекбоксы alcohol, обработаем их отдельно
+        if (key === 'alcohol') {
+            continue;
+        }
+        params.append(key, value);
+    }
+    
+    // Обрабатываем чекбоксы алкоголя
+    const alcoholCheckboxes = form.querySelectorAll('input[name="alcohol"]:checked');
+    const alcoholValues = Array.from(alcoholCheckboxes).map(cb => {
+        // Преобразуем значения в читаемый вид
+        const valueMap = {
+            'red_wine': 'Красное вино',
+            'white_wine': 'Белое вино',
+            'champagne': 'Шампанское',
+            'non_alcoholic': 'Безалкогольные'
+        };
+        return valueMap[cb.value] || cb.value;
+    });
+    
+    // Добавляем объединенное значение алкоголя
+    if (alcoholValues.length > 0) {
+        params.append('alcohol_combined', alcoholValues.join(', '));
+    } else {
+        params.append('alcohol_combined', 'Не указано');
+    }
+    
+    return params;
+}
+
+// Функция валидации формы
+function validateForm(form) {
+    const name = document.getElementById('name')?.value.trim();
+    const phone = document.getElementById('phone')?.value.trim();
+    const attendance = document.querySelector('input[name="attendance"]:checked');
+    
+    if (!name || name.length < 2) {
+        showSimpleNotification('❌ Пожалуйста, введите имя и фамилию');
+        return false;
+    }
+    
+    if (!phone || phone.length < 5) {
+        showSimpleNotification('❌ Пожалуйста, введите номер телефона');
+        return false;
+    }
+    
+    // Простая валидация телефона (можно улучшить)
+    const phoneRegex = /^[\d\s\+\-\(\)]{5,}$/;
+    if (!phoneRegex.test(phone)) {
+        showSimpleNotification('❌ Пожалуйста, введите корректный номер телефона');
+        return false;
+    }
+    
+    if (!attendance) {
+        showSimpleNotification('❌ Выберите вариант присутствия');
+        return false;
+    }
+    
+    return true;
+}
+
+// Функция отправки формы
+async function submitForm(form) {
+    try {
+        // Валидация
+        if (!validateForm(form)) {
+            return;
+        }
+        
+        // Показываем уведомление о отправке
+        showSimpleNotification('⏳ Отправка данных...');
+        
+        // Собираем данные
+        const params = serializeForm(form);
+        
+        // Отправляем данные
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Важно для работы с Google Apps Script
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        });
+        
+        // При no-cors мы не можем прочитать ответ, поэтому показываем успех
+        showSimpleNotification('✅ Спасибо! Ваш ответ отправлен.');
+        
+        // Очищаем форму
+        form.reset();
+        
+        // Дополнительно: можно сохранить в localStorage для отладки
+        saveToLocalStorage(params);
+        
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        showSimpleNotification('❌ Ошибка при отправке. Попробуйте позже.');
+    }
+}
+
+// Функция для сохранения данных в localStorage (для отладки)
+function saveToLocalStorage(params) {
+    try {
+        const submissions = JSON.parse(localStorage.getItem('wedding_submissions') || '[]');
+        submissions.push({
+            timestamp: new Date().toISOString(),
+            data: Object.fromEntries(params)
+        });
+        // Храним только последние 10 записей
+        if (submissions.length > 10) {
+            submissions.shift();
+        }
+        localStorage.setItem('wedding_submissions', JSON.stringify(submissions));
+    } catch (e) {
+        console.error('Error saving to localStorage:', e);
+    }
+}
+
+// Инициализация формы
+function initForm() {
     const form = document.getElementById('weddingForm');
     
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Валидация
-            const name = document.getElementById('name')?.value.trim();
-            const phone = document.getElementById('phone')?.value.trim();
-            const attendance = document.querySelector('input[name="attendance"]:checked');
-            
-            if (!name || !phone) {
-                alert('Пожалуйста, заполните имя и телефон');
-                return;
+    if (!form) return;
+    
+    // Добавляем маску для телефона (опционально)
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            // Простая маска для телефона
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 1) {
+                    value = `+7 (${value}`;
+                } else if (value.length <= 4) {
+                    value = `+7 (${value.substring(1, 4)}`;
+                } else if (value.length <= 7) {
+                    value = `+7 (${value.substring(1, 4)}) ${value.substring(4, 7)}`;
+                } else if (value.length <= 9) {
+                    value = `+7 (${value.substring(1, 4)}) ${value.substring(4, 7)}-${value.substring(7, 9)}`;
+                } else {
+                    value = `+7 (${value.substring(1, 4)}) ${value.substring(4, 7)}-${value.substring(7, 9)}-${value.substring(9, 11)}`;
+                }
+                e.target.value = value;
             }
-            
-            if (!attendance) {
-                alert('Выберите вариант присутствия');
-                return;
-            }
-            
-            // ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ
-            showSimpleNotification();
-            
-            // Сбрасываем форму
-            form.reset();
-            
-            // Отправляем данные если нужно (но уведомление уже показано)
-            try {
-                const formData = new FormData(form);
-                fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: formData
-                }).catch(() => {});
-            } catch (e) {}
         });
     }
-});
+    
+    // Обработчик отправки формы
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitForm(this);
+    });
+    
+    // Добавляем обработчики для чекбоксов "Выбрать все" (опционально)
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+    if (checkboxes.length > 0) {
+        const selectAllBtn = document.createElement('button');
+        selectAllBtn.type = 'button';
+        selectAllBtn.textContent = 'Выбрать все напитки';
+        selectAllBtn.className = 'select-all-btn';
+        selectAllBtn.style.cssText = `
+            background: none;
+            border: 1px solid #b7a18b;
+            color: #6b4f3a;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        `;
+        
+        selectAllBtn.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f5efe9';
+        });
+        
+        selectAllBtn.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = 'transparent';
+        });
+        
+        selectAllBtn.addEventListener('click', function() {
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => {
+                cb.checked = !allChecked;
+            });
+            this.textContent = allChecked ? 'Выбрать все напитки' : 'Снять все';
+        });
+        
+        // Добавляем кнопку после группы чекбоксов
+        const checkboxGroup = document.querySelector('.checkbox-group');
+        if (checkboxGroup && !document.querySelector('.select-all-btn')) {
+            checkboxGroup.parentNode.insertBefore(selectAllBtn, checkboxGroup.nextSibling);
+        }
+    }
+}
 
 // Предзагрузка изображений
 window.addEventListener('load', function() {
@@ -192,4 +363,30 @@ window.addEventListener('load', function() {
         const image = new Image();
         image.src = img;
     });
+    
+    // Проверяем, есть ли сохраненные данные в localStorage (для отладки)
+    const submissions = localStorage.getItem('wedding_submissions');
+    if (submissions) {
+        console.log('Previous submissions:', JSON.parse(submissions));
+    }
 });
+
+// Обработка ошибок
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
+});
+
+// Экспортируем функции для отладки в консоль
+window.debug = {
+    showSubmissions: function() {
+        const submissions = localStorage.getItem('wedding_submissions');
+        console.log(submissions ? JSON.parse(submissions) : 'No submissions');
+    },
+    clearSubmissions: function() {
+        localStorage.removeItem('wedding_submissions');
+        console.log('Submissions cleared');
+    },
+    testNotification: function() {
+        showSimpleNotification('✅ Тестовое уведомление');
+    }
+};
