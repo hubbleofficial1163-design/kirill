@@ -1,5 +1,5 @@
 // script.js
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqPqUqdrLXan32IMIimZMOfcv_s5wtqMmG2OCQJsLRtoJISrWU6CV6z_wlBD_Cozm8/exec';
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpeMuMN5VlPEEJ6LLDlHGCrnL29yL7OHTsTZKNFhyTSzqRsQbIk9yuTUabiGBaa2k/exec';
 
 // Календарь
 class WeddingCalendar {
@@ -152,6 +152,24 @@ function showSimpleNotification(message = '💌 Спасибо! Ваш отве�
     }, 4000);
 }
 
+// Функция для экранирования номера телефона (чтобы не воспринимался как формула)
+function escapePhoneNumber(phone) {
+    if (!phone) return '';
+    
+    // Если номер начинается с +, добавляем апостроф в начале
+    // Это заставит Google Sheets воспринимать как текст
+    if (phone.startsWith('+')) {
+        return "'" + phone;
+    }
+    
+    // Если есть другие спецсимволы, которые могут быть проблемой
+    if (phone.includes('=') || phone.includes('@') || phone.includes('-') || phone.includes('(') || phone.includes(')')) {
+        return "'" + phone;
+    }
+    
+    return phone;
+}
+
 // Функция для сбора данных формы в URL-encoded формат
 function serializeForm(form) {
     const formData = new FormData(form);
@@ -163,7 +181,13 @@ function serializeForm(form) {
         if (key === 'alcohol') {
             continue;
         }
-        params.append(key, value);
+        
+        // Для телефона добавляем экранирование
+        if (key === 'phone') {
+            params.append(key, escapePhoneNumber(value));
+        } else {
+            params.append(key, value);
+        }
     }
     
     // Обрабатываем чекбоксы алкоголя
@@ -205,7 +229,7 @@ function validateForm(form) {
         return false;
     }
     
-    // Простая валидация телефона (можно улучшить)
+    // Простая валидация телефона
     const phoneRegex = /^[\d\s\+\-\(\)]{5,}$/;
     if (!phoneRegex.test(phone)) {
         showSimpleNotification('❌ Пожалуйста, введите корректный номер телефона');
@@ -237,20 +261,19 @@ async function submitForm(form) {
         // Отправляем данные
         const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // Важно для работы с Google Apps Script
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: params.toString()
         });
         
-        // При no-cors мы не можем прочитать ответ, поэтому показываем успех
         showSimpleNotification('✅ Спасибо! Ваш ответ отправлен.');
         
         // Очищаем форму
         form.reset();
         
-        // Дополнительно: можно сохранить в localStorage для отладки
+        // Сохраняем в localStorage для отладки
         saveToLocalStorage(params);
         
     } catch (error) {
@@ -259,7 +282,7 @@ async function submitForm(form) {
     }
 }
 
-// Функция для сохранения данных в localStorage (для отладки)
+// Функция для сохранения данных в localStorage
 function saveToLocalStorage(params) {
     try {
         const submissions = JSON.parse(localStorage.getItem('wedding_submissions') || '[]');
@@ -267,7 +290,6 @@ function saveToLocalStorage(params) {
             timestamp: new Date().toISOString(),
             data: Object.fromEntries(params)
         });
-        // Храним только последние 10 записей
         if (submissions.length > 10) {
             submissions.shift();
         }
@@ -283,11 +305,10 @@ function initForm() {
     
     if (!form) return;
     
-    // Добавляем маску для телефона (опционально)
+    // Добавляем маску для телефона
     const phoneInput = document.getElementById('phone');
     if (phoneInput) {
         phoneInput.addEventListener('input', function(e) {
-            // Простая маска для телефона
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 0) {
                 if (value.length <= 1) {
@@ -312,7 +333,7 @@ function initForm() {
         submitForm(this);
     });
     
-    // Добавляем обработчики для чекбоксов "Выбрать все" (опционально)
+    // Кнопка "Выбрать все" для напитков
     const checkboxes = form.querySelectorAll('input[type="checkbox"]');
     if (checkboxes.length > 0) {
         const selectAllBtn = document.createElement('button');
@@ -348,7 +369,6 @@ function initForm() {
             this.textContent = allChecked ? 'Выбрать все напитки' : 'Снять все';
         });
         
-        // Добавляем кнопку после группы чекбоксов
         const checkboxGroup = document.querySelector('.checkbox-group');
         if (checkboxGroup && !document.querySelector('.select-all-btn')) {
             checkboxGroup.parentNode.insertBefore(selectAllBtn, checkboxGroup.nextSibling);
@@ -363,20 +383,9 @@ window.addEventListener('load', function() {
         const image = new Image();
         image.src = img;
     });
-    
-    // Проверяем, есть ли сохраненные данные в localStorage (для отладки)
-    const submissions = localStorage.getItem('wedding_submissions');
-    if (submissions) {
-        console.log('Previous submissions:', JSON.parse(submissions));
-    }
 });
 
-// Обработка ошибок
-window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
-});
-
-// Экспортируем функции для отладки в консоль
+// Debug функции
 window.debug = {
     showSubmissions: function() {
         const submissions = localStorage.getItem('wedding_submissions');
